@@ -43,8 +43,8 @@ public class Driver{
         System.out.println("Category\tPercentage");
         for (Map.Entry<String, double[]> entry: gradesMap.entrySet()
                 ) {
-            double[] temp = entry.getValue();
-            System.out.println(entry.getKey()+"\t\t\t"+temp[0]*100+"%");
+            double[] tempArray = entry.getValue();
+            System.out.println(entry.getKey()+"\t\t\t"+tempArray[0]*100+"%");
         }
         String temp;
         for (Map.Entry<String, double[]> entry: gradesMap.entrySet()
@@ -60,7 +60,7 @@ public class Driver{
                     tempNum = Double.parseDouble(temp);
                 } catch (Exception e){
                     isInt = false;
-                    System.out.println("Weight must be an integer");
+                    System.out.println("Weight must be a number");
                     //in.next();
                 }
             } while (!isInt);
@@ -68,7 +68,48 @@ public class Driver{
             tempArray[1] = tempNum/100;
             gradesMap.put(entry.getKey(), tempArray);
         }
+        double total = totalWeight();
+        do {
+            if (!(Math.abs(1 - total) < .00000001)) {
+                System.out.println("Weighted total must be equal to 1");
+                display();
+                do {
+                    System.out.print("Enter a category to edit: ");
+                    temp = in.nextLine();
+                    if (!gradesMap.containsKey(temp))
+                        System.out.println("The category does not exist");
+                    else {
+                        System.out.print("Enter the new Weight for " +temp+ ": ");
+
+                    }
+                } while (!gradesMap.containsKey(temp));
+            }
+            total = totalWeight();
+        } while (!(Math.abs(1 - total) < .00000001));
+
     }
+
+    private double totalWeight(){
+        double total = 0;
+        for (Map.Entry<String, double[]> entry: gradesMap.entrySet()
+                ) {
+            double[] tempArray = entry.getValue();
+            total += tempArray[1];
+        }
+        return total;
+    }
+
+    private double checkDouble(String input){
+
+
+        return 0;
+    }
+
+    private double checkDouble(double num){
+
+        return 0;
+    }
+
 
     private int getNumberOfCategories(){
         int temp = 0;
