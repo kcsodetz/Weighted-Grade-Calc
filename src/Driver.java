@@ -1,5 +1,6 @@
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.DoubleStream;
 
 /**
  * Created by Ken Sodetz on 12/14/2016.
@@ -19,25 +20,26 @@ public class Driver{
     private void inputGrades(int line) {
 
         Boolean isDouble;
+
         String tempName;
         double tempGrade = 0;
         for (int i = 0; i < line; i++) {
 
             double[] numArray = new double[2];
 
-            System.out.println("Enter the name of the Category " + (i + 1) + ": ");
-            tempName = in.nextLine();
+            System.out.print("Enter the name of the Category " + (i + 1) + ": ");
+            tempName = in.next();
             do {
                 isDouble = true;
                 System.out.print("Enter the percent of category " + tempName + " (E.g: 94.5): ");
-                tempGrade = checkDouble(in.nextLine());
+                tempGrade = checkDouble(in.next());
                 if (tempGrade == 0)
                     isDouble = false;
             } while (!isDouble);
 
             numArray[0] = tempGrade/100.0;
             
-            gradesMap.put(tempName, numArray);
+            gradesMap.put(tempName.toUpperCase(), numArray);
         }
     }
 
@@ -57,8 +59,8 @@ public class Driver{
             boolean isInt;
             do {
                 isInt = true;
-                System.out.print("Enter the weight of "+entry.getKey()+": ");
-                tempNum = checkDouble(in.nextLine());
+                System.out.print("Enter the weight of "+entry.getKey()+"(E.g: 15): ");
+                tempNum = checkDouble(in.next());
                 if (tempNum == 0)
                     isInt = false;
             } while (!isInt);
@@ -81,15 +83,15 @@ public class Driver{
                     notValid = false;
                     display();
                     System.out.print("Enter a category to edit its weight: ");
-                    temp = in.nextLine();
-                    if (!gradesMap.containsKey(temp)) {
+                    temp = in.next();
+                    if (!gradesMap.containsKey(temp.toUpperCase())) {
                         notValid = true;
                         System.out.println("Category not found");
                     } else {
                         do {
                             notDouble = false;
-                            System.out.print("Enter the new weight for " + temp + ": ");
-                            tempNum = checkDouble(in.nextLine());
+                            System.out.print("Enter the new weight for " + temp + "(E.g: 15): ");
+                            tempNum = checkDouble(in.next());
                             if (tempNum == 0)
                                 notDouble = true;
                             double[] tempArray = gradesMap.get(temp);
@@ -156,24 +158,41 @@ public class Driver{
 
     //displays the category name, percent for the category, anc the weight of the category, for all categories given
     private void display(){
-        System.out.println("Category\tPercentage\tWeight");
+        System.out.printf("%-15s %-15s %-15s %n", "Category", "Percentage", "Weight");
         for (Map.Entry<String, double[]> entry: gradesMap.entrySet()
              ) {
             double[] temp = entry.getValue();
             String tempStr = Double.toString(temp[0]*100.0);
             BigDecimal bigDecimal = new BigDecimal((tempStr));
             BigDecimal bd = bigDecimal.setScale(2, BigDecimal.ROUND_HALF_UP);
-            System.out.println(entry.getKey()+"\t\t\t"+bd.toString()+"%"+"\t\t"+temp[1]);
+            System.out.printf("%-15s %-15s %-15s %n", entry.getKey(), bd.toString()+"%", temp[1]);
         }
+    }
+
+    //calculated the final numeric total
+    private void calculateGrade(){ //TODO finish method
+        int i = 0;
+        double[] tempAdd = new double[10];
+        for (Map.Entry<String, double[]> entry: gradesMap.entrySet()
+             ) {
+            double[] temp = entry.getValue();
+            tempAdd[i] = temp[0] * temp[1];
+            i++;
+        }
+        double sum = DoubleStream.of(tempAdd).sum();
+        double grade = (sum/totalWeight()*100);
+        String tempStr = Double.toString(grade);
+        BigDecimal bigDecimal = new BigDecimal((tempStr));
+        BigDecimal bd = bigDecimal.setScale(2, BigDecimal.ROUND_HALF_UP);
+        System.out.println("The final weighted total is "+bd.toString()+"%");
     }
 
     //main method
     public static void main(String[] args) {
         Driver driver = new Driver();
         driver.inputGrades(driver.getNumberOfCategories());
-
-        driver.display();
         driver.inputWeight();
         driver.display();
+        driver.calculateGrade();
     }
 }
